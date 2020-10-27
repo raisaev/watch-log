@@ -10,26 +10,20 @@ class Console implements HandlerInterface
 
     public function handle(\Isaev\WatchLog\Log\Entity $entity, string $filePath): void
     {
-        $date = \DateTime::createFromFormat(
-            'Y-m-d\TH:i:s.u\Z',
-            $entity->getRaw()['create_datetimemc'],
-            new \DateTimeZone('UTC')
-        );
-        $date->setTimezone(new \DateTimeZone('Europe/Kiev'));
-
         $message = <<<TEXT
 {$this->colored($entity->getServiceName(), 'green')}
-{$filePath} {$date->format('Y-m-d H:i')}
+{$filePath} {$entity->getDateTime()->format('Y-m-d H:i')}
 
-{$this->colored($entity->getText(), 'red')} [{$this->colored($entity->getType(), 'red')}]
-{$entity->getFile()}::{$entity->getLine()}
+{$this->colored($entity->getText(), 'red')}
+{$this->colored($entity->getExceptionMessage(), 'red')}
+{$entity->getExceptionFile()}::{$entity->getExceptionLine()}
 
-{$this->colored($entity->getTrace(), 'yellow')}
+{$this->colored($entity->getExceptionTrace(), 'yellow')}
 
 TEXT;
 
-        if (!empty($entity->getExceptionData()['data'])) {
-            $data = json_encode($entity->getExceptionData()['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($entity->getExceptionData()) {
+            $data = json_encode($entity->getExceptionData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $message .= <<<TEXT
 
 {$this->colored($data, 'cyan')}

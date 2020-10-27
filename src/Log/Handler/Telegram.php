@@ -38,15 +38,16 @@ class Telegram implements HandlerInterface
 <b>{$entity->getServiceName()}</b>
 {$filePath}
 
-{$entity->getText()} [<b>{$entity->getType()}</b>]
-{$entity->getFile()}::{$entity->getLine()}
+{$entity->getText()}
+{$entity->getExceptionMessage()}
+{$entity->getExceptionFile()}::{$entity->getExceptionLine()}
 <code>
-{$entity->getTrace()}
+{$entity->getExceptionTrace()}
 </code>
 TEXT;
 
-        if (!empty($entity->getExceptionData()['data'])) {
-            $data = json_encode($entity->getExceptionData()['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($entity->getExceptionData()) {
+            $data = json_encode($entity->getExceptionData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $message .= <<<TEXT
 <code>
 {$data}

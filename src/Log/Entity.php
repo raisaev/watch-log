@@ -12,18 +12,6 @@ class Entity
     /** @var string */
     private $text;
 
-    /** @var string */
-    private $type;
-
-    /** @var string */
-    private $file;
-
-    /** @var int */
-    private $line;
-
-    /** @var array */
-    private $trace;
-
     /** @var array */
     private $raw;
 
@@ -32,18 +20,10 @@ class Entity
     public function __construct(
         string $serviceName,
         string $text,
-        string $type,
-        string $file,
-        int $line,
-        array $trace,
         array $raw
     ) {
         $this->serviceName = $serviceName;
         $this->text        = $text;
-        $this->type        = $type;
-        $this->file        = $file;
-        $this->line        = $line;
-        $this->trace       = $trace;
         $this->raw         = $raw;
     }
 
@@ -66,38 +46,6 @@ class Entity
     }
 
     /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFile(): string
-    {
-        return $this->file;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLine(): int
-    {
-        return $this->line;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTrace(): string
-    {
-        return implode(PHP_EOL, $this->trace);
-    }
-
-    /**
      * @return array
      */
     public function getRaw(): array
@@ -105,11 +53,64 @@ class Entity
         return $this->raw;
     }
 
+    public function getDateTime(): \DateTime
+    {
+        $date = \DateTime::createFromFormat('Y-m-d\TH:i:s.u\Z',
+            $this->raw['create_datetimemc'],
+            new \DateTimeZone('UTC')
+        );
+        $date->setTimezone(new \DateTimeZone('Europe/Kiev'));
+
+        return $date;
+    }
+
     // ########################################
+
+    public function getException(): ?array
+    {
+        if (!empty($this->raw['data']['data']['_exception_data_'])) {
+            return $this->raw['data']['data']['_exception_data_'];
+        }
+
+        if (!empty($this->raw['data']['data']['exception_data'])) {
+            return $this->raw['data']['data']['exception_data'];
+        }
+
+        return null;
+    }
+
+    public function getExceptionMessage(): string
+    {
+        return $this->getException()['message'];
+    }
+
+    public function getExceptionType(): string
+    {
+        return $this->getException()['type'];
+    }
+
+    public function getExceptionFile(): string
+    {
+        return $this->getException()['file'];
+    }
+
+    public function getExceptionLine(): int
+    {
+        return $this->getException()['line'];
+    }
 
     public function getExceptionData(): array
     {
-        return $this->raw['data']['data']['_exception_data_'] ?? [];
+        return $this->getException()['data'];
+    }
+
+    public function getExceptionTrace(): string
+    {
+        if (is_array($this->getException()['trace'])) {
+            return implode(PHP_EOL, $this->getException()['trace']);
+        }
+
+        return $this->getException()['trace'];
     }
 
     // ########################################
