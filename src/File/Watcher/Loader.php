@@ -17,11 +17,7 @@ class Loader
 
         $result = [];
         foreach ($files as $file) {
-            if (!is_file($file)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $file));
-            }
-
-            $result[] = new \Isaev\WatchLog\File\Watcher(new \SplFileInfo($file));
+            $result[] = new \Isaev\WatchLog\File\Watcher($file);
         }
 
         return $result;

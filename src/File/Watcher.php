@@ -4,67 +4,84 @@ namespace Isaev\WatchLog\File;
 
 class Watcher
 {
-    /** @var \SplFileInfo  */
+    /** @var string */
+    private $filePath;
+
+    // ----------------------------------------
+
+    /** @var \SplFileInfo|null  */
     private $fileInfo;
 
-    /** @var int */
-    private $lastModified;
-
-    /** @var \SplFileObject */
+    /** @var \SplFileObject|null */
     private $resource;
+
+    /** @var int|null */
+    private $lastModified;
 
     // ########################################
 
-    public function __construct(\SplFileInfo $fileInfo)
+    public function __construct(string $filePath)
     {
-        $this->fileInfo = $fileInfo;
-        $this->resource = $fileInfo->openFile('r');
+        $this->filePath = $filePath;
+
+        if (!is_file($this->filePath)) {
+            return;
+        }
+
+        $this->fileInfo = new \SplFileInfo($this->filePath);
+        $this->resource = $this->fileInfo->openFile('r');
         $this->resource->fseek(0, SEEK_END);
 
-        $this->updateLastModified();
+        $this->lastModified = $this->fileInfo->getMTime();
     }
 
     // ########################################
 
     public function checkChange(): bool
     {
-        clearstatcache(true, $this->fileInfo->getRealPath());
+        clearstatcache(true, $this->filePath);
 
-        $lastModified = $this->lastModified;
-        $this->updateLastModified();
+        if ($this->getFileInfo() === null) {
+            if (is_file($this->filePath)) {
+                $this->fileInfo = new \SplFileInfo($this->filePath);
+                $this->resource = $this->fileInfo->openFile('r');
 
-        if ($lastModified === $this->lastModified) {
+                $this->lastModified = $this->fileInfo->getMTime();
+                return true;
+            }
+
             return false;
         }
 
+        $lastModified = $this->fileInfo->getMTime();
+        if ($this->lastModified === $lastModified) {
+            return false;
+        }
+
+        $this->lastModified = $lastModified;
         return true;
-    }
-
-    public function updateLastModified(): void
-    {
-        $this->lastModified = $this->fileInfo->getMTime();
-    }
-
-    public function updateResource(): void
-    {
-        unset($this->resource);
-        $this->resource = $this->fileInfo->openFile('r');
-        $this->resource->fseek(0, SEEK_END);
     }
 
     // ########################################
 
-    public function getFileInfo(): \SplFileInfo
+    public function getFilePath(): string
+    {
+        return $this->filePath;
+    }
+
+    // ----------------------------------------
+
+    public function getFileInfo(): ?\SplFileInfo
     {
         return $this->fileInfo;
     }
 
-    public function getResource(): \SplFileObject
+    public function getResource(): ?\SplFileObject
     {
         return $this->resource;
     }
 
-    public function getLastModified(): int
+    public function getLastModified(): ?int
     {
         return $this->lastModified;
     }
