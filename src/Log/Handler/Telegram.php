@@ -34,33 +34,12 @@ class Telegram implements HandlerInterface
 
     public function handle(\Isaev\WatchLog\Log\Entity $entity, string $filePath): void
     {
-        $message = <<<TEXT
-<b>{$entity->getServiceName()}</b>
-{$filePath}
-
-{$entity->getText()}
-{$entity->getExceptionMessage()}
-{$entity->getExceptionFile()}::{$entity->getExceptionLine()}
-<code>
-{$entity->getExceptionTrace()}
-</code>
-TEXT;
-
-        if ($entity->getExceptionData()) {
-            $data = json_encode($entity->getExceptionData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            $message .= <<<TEXT
-<code>
-{$data}
-</code>
-TEXT;
-        }
-
         $response = $this->httpClient->request(
             'POST',
             "https://api.telegram.org/bot{$this->token}/sendMessage",
             [
                 'body' => [
-                    'text'       => $message,
+                    'text'       => $this->getMessage($entity, $filePath),
                     'chat_id'    => $this->chatId,
                     'parse_mode' => 'HTML'
                 ]
@@ -71,6 +50,38 @@ TEXT;
         if (!empty($result['description'])) {
             throw new Exception($result['description']);
         }
+    }
+
+    // ########################################
+
+    private function getMessage(\Isaev\WatchLog\Log\Entity $entity, string $filePath): string
+    {
+        $message = <<<TEXT
+<b>{$entity->getServiceName()}</b>
+{$filePath}
+
+{$entity->getText()}
+TEXT;
+
+        if ($entity->getException()) {
+            $message .= <<<TEXT
+{$entity->getExceptionMessage()}
+{$entity->getExceptionFile()}::{$entity->getExceptionLine()}
+<code>
+{$entity->getExceptionTrace()}
+</code>
+TEXT;
+            if ($entity->getExceptionData()) {
+                $data = json_encode($entity->getExceptionData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                $message .= <<<TEXT
+<code>
+{$data}
+</code>
+TEXT;
+            }
+        }
+
+        return $message;
     }
 
     // ########################################
