@@ -9,7 +9,7 @@ class WatchLog
     /** @var File\Watcher[] */
     private $watchers;
 
-    /** @var Log\HandlerInterface[] */
+    /** @var Log\Handler\HandlerInterface[] */
     private $handlers;
 
     /** @var int */
@@ -52,7 +52,7 @@ class WatchLog
             throw new Exception('No handlers registered.');
         }
 
-        echo 'watching...' . PHP_EOL;
+        echo 'watching...' . PHP_EOL . PHP_EOL;
         $this->watch = true;
 
         do {
@@ -84,7 +84,7 @@ class WatchLog
                     }
 
                     foreach ($this->handlers as $handler) {
-                        $handler->handle($entity);
+                        $handler->handle($entity, $watcher->getFilePath());
                     }
                 }
 

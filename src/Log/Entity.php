@@ -106,4 +106,11 @@ class Entity
     }
 
     // ########################################
+
+    public function getExceptionData(): array
+    {
+        return $this->raw['data']['data']['_exception_data_'] ?? [];
+    }
+
+    // ########################################
 }

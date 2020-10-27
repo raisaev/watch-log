@@ -32,16 +32,27 @@ class Telegram implements HandlerInterface
 
     // ########################################
 
-    public function handle(\Isaev\WatchLog\Log\Entity $entity): void
+    public function handle(\Isaev\WatchLog\Log\Entity $entity, string $filePath): void
     {
         $message = <<<TEXT
-service: <b>{$entity->getServiceName()}</b>
+<b>{$entity->getServiceName()}</b>
+{$filePath}
+
 {$entity->getText()} [<b>{$entity->getType()}</b>]
 {$entity->getFile()}::{$entity->getLine()}
 <code>
 {$entity->getTrace()}
 </code>
 TEXT;
+
+        if (!empty($entity->getExceptionData()['data'])) {
+            $data = json_encode($entity->getExceptionData()['data'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $message .= <<<TEXT
+<code>
+{$data}
+</code>
+TEXT;
+        }
 
         $response = $this->httpClient->request(
             'POST',

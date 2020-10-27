@@ -8,7 +8,7 @@ interface HandlerInterface
 {
     // ########################################
 
-    public function handle(\Isaev\WatchLog\Log\Entity $entity): void;
+    public function handle(\Isaev\WatchLog\Log\Entity $entity, string $filePath): void;
 
     // ########################################
 }
