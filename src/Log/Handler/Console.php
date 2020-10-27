@@ -10,9 +10,16 @@ class Console implements HandlerInterface
 
     public function handle(\Isaev\WatchLog\Log\Entity $entity, string $filePath): void
     {
+        $date = \DateTime::createFromFormat(
+            'Y-m-d\TH:i:s.u\Z',
+            $entity->getRaw()['create_datetimemc'],
+            new \DateTimeZone('UTC')
+        );
+        $date->setTimezone(new \DateTimeZone('Europe/Kiev'));
+
         $message = <<<TEXT
 {$this->colored($entity->getServiceName(), 'green')}
-{$filePath}
+{$filePath} {$date->format('Y-m-d H:i')}
 
 {$this->colored($entity->getText(), 'red')} [{$this->colored($entity->getType(), 'red')}]
 {$entity->getFile()}::{$entity->getLine()}
