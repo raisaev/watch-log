@@ -99,7 +99,7 @@ class Entity
         return $this->getException()['line'];
     }
 
-    public function getExceptionData(): array
+    public function getExceptionData(): ?array
     {
         return $this->getException()['data'];
     }

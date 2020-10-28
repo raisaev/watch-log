@@ -65,6 +65,7 @@ TEXT;
 
         if ($entity->getException()) {
             $message .= <<<TEXT
+
 {$entity->getExceptionMessage()}
 {$entity->getExceptionFile()}::{$entity->getExceptionLine()}
 <code>
