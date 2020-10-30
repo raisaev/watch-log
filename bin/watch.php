@@ -27,4 +27,7 @@ $containerBuilder->compile(true);
 
 /** @var \Isaev\WatchLog\WatchLog $watch */
 $watch = $containerBuilder->get(\Isaev\WatchLog\WatchLog::class);
+if (in_array('--debug', $argv, true)) {
+    $watch->setIsDebugMode(true);
+}
 $watch->start();
