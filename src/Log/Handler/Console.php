@@ -26,6 +26,7 @@ TEXT;
         if ($entity->getException()) {
             $message .= <<<TEXT
 
+Exception:
 {$this->colored($entity->getExceptionMessage(), 'red')}
 {$entity->getExceptionFile()}::{$entity->getExceptionLine()}
 

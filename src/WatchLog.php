@@ -21,6 +21,9 @@ class WatchLog
     /** @var Log\Entity\Parser */
     private $parser;
 
+    /** @var bool */
+    private $isDebugMode;
+
     // ########################################
 
     public function __construct(
@@ -75,9 +78,17 @@ class WatchLog
                 continue;
             }
 
+            if ($this->isDebugMode) {
+                echo 'changed: ' . $watcher->getFilePath() . PHP_EOL;
+            }
+
             try {
                 while (!$watcher->getResource()->eof()) {
                     $line = $watcher->getResource()->fgets();
+                    if ($this->isDebugMode) {
+                        echo $line . PHP_EOL;
+                    }
+
                     $entity = $this->parser->parseLine($line);
                     if ($entity === null) {
                         continue;
@@ -105,6 +116,12 @@ class WatchLog
     public function addHandler(Log\Handler\HandlerInterface $handler): self
     {
         $this->handlers[] = $handler;
+        return $this;
+    }
+
+    public function setIsDebugMode(bool $mode): self
+    {
+        $this->isDebugMode = $mode;
         return $this;
     }
 
