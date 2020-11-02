@@ -6,6 +6,12 @@ namespace Isaev\WatchLog;
 
 class WatchLog
 {
+    /** @var Log\Entity\Parser */
+    private $parser;
+
+    /** @var Output */
+    private $output;
+
     /** @var File\Watcher[] */
     private $watchers;
 
@@ -18,9 +24,6 @@ class WatchLog
     /** @var bool */
     private $watch = false;
 
-    /** @var Log\Entity\Parser */
-    private $parser;
-
     /** @var bool */
     private $isDebugMode;
 
@@ -29,14 +32,16 @@ class WatchLog
     public function __construct(
         File\Watcher\Loader $watcherLoader,
         Log\Entity\Parser $parser,
+        Output $output,
         array $handlers = [],
         int $checkInterval = 10
     ) {
+        $this->parser = $parser;
+        $this->output = $output;
+
         $this->handlers      = $handlers;
         $this->checkInterval = $checkInterval;
-
-        $this->watchers = $watcherLoader->load();
-        $this->parser   = $parser;
+        $this->watchers      = $watcherLoader->load();
     }
 
     // ########################################
@@ -55,7 +60,7 @@ class WatchLog
             throw new Exception('No handlers registered.');
         }
 
-        echo 'watching...' . PHP_EOL . PHP_EOL;
+        $this->output->printLn('watching...');
         $this->watch = true;
 
         do {
@@ -79,14 +84,14 @@ class WatchLog
             }
 
             if ($this->isDebugMode) {
-                echo 'changed: ' . $watcher->getFilePath() . PHP_EOL;
+                $this->output->printLn('changed: ' . $watcher->getFilePath());
             }
 
             try {
                 while (!$watcher->getResource()->eof()) {
                     $line = $watcher->getResource()->fgets();
                     if ($this->isDebugMode) {
-                        echo $line . PHP_EOL;
+                        $this->output->printLn($line);
                     }
 
                     $entity = $this->parser->parseLine($line);
@@ -100,7 +105,7 @@ class WatchLog
                 }
 
             } catch (\Throwable $e) {
-                echo $e->__toString() . PHP_EOL . PHP_EOL;
+                $this->output->printLn2($e->__toString());
             }
         }
     }

@@ -58,7 +58,7 @@ class Telegram implements HandlerInterface
     {
         $message = <<<TEXT
 <b>{$entity->getServiceName()}</b>
-{$filePath}
+<i>{$filePath}</i>
 
 {$entity->getText()}
 TEXT;
@@ -66,9 +66,10 @@ TEXT;
         if ($entity->getException()) {
             $message .= <<<TEXT
 
+
 Exception:
 {$entity->getExceptionMessage()}
-{$entity->getExceptionFile()}::{$entity->getExceptionLine()}
+<i>{$entity->getExceptionFile()}::{$entity->getExceptionLine()}</i>
 <code>
 {$entity->getExceptionTrace()}
 </code>
