@@ -13,15 +13,8 @@ $containerBuilder = new ContainerBuilder();
 $loader = new YamlFileLoader($containerBuilder, new FileLocator(dirname(__DIR__) . '/config'));
 $loader->load('services.yaml');
 
-$envFiles = [
-    __DIR__ . '/../.env',
-    __DIR__ . '/../.env.local'
-];
-
 $dotEnv = new \Symfony\Component\Dotenv\Dotenv();
-foreach ($envFiles as $file) {
-    is_file($file) && $dotEnv->load($file);
-}
+$dotEnv->loadEnv(__DIR__ . '/../.env');
 
 $containerBuilder->compile(true);
 
