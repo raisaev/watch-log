@@ -6,6 +6,16 @@ namespace Isaev\WatchLog\File\Watcher;
 
 class Loader
 {
+    /** @var array */
+    private $files;
+
+    // ########################################
+
+    public function __construct(array $files)
+    {
+        $this->files = $files;
+    }
+
     // ########################################
 
     /**
@@ -13,10 +23,8 @@ class Loader
      */
     public function load(): array
     {
-        $files = array_filter(explode("\n", $_ENV['LOG_FILES_LIST']));
-
         $result = [];
-        foreach ($files as $file) {
+        foreach ($this->files as $file) {
             $result[] = new \Isaev\WatchLog\File\Watcher($file);
         }
 

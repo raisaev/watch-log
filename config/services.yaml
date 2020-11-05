@@ -11,14 +11,26 @@ services:
   Isaev\WatchLog\:
     resource: '../src/'
 
+  Isaev\WatchLog\Console\Application:
+    public: true
+    arguments:
+      $name: 'Watch Log'
+      $commands:
+        - '@Isaev\WatchLog\Console\Command\Clear'
+        - '@Isaev\WatchLog\Console\Command\Watch'
+
   Isaev\WatchLog\Log\Handler\Telegram:
     arguments:
       $token: '%env(TELEGRAM_API_KEY)%'
       $chatId: '%env(TELEGRAM_CHAT_ID)%'
 
   Isaev\WatchLog\WatchLog:
-    public: true
     arguments:
       $handlers:
         - '@Isaev\WatchLog\Log\Handler\Telegram'
         - '@Isaev\WatchLog\Log\Handler\Console'
+
+  Isaev\WatchLog\File\Watcher\Loader:
+    arguments:
+      $files:
+        - 'C:\wamp64\www\amazon_services\watch-log\logging.json'
