@@ -27,8 +27,8 @@ services:
   Isaev\WatchLog\WatchLog:
     arguments:
       $handlers:
-        - '@Isaev\WatchLog\Log\Handler\Telegram'
         - '@Isaev\WatchLog\Log\Handler\Console'
+        - '@Isaev\WatchLog\Log\Handler\Telegram'
 
   Isaev\WatchLog\File\Watcher\Loader:
     arguments:

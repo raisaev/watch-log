@@ -37,6 +37,7 @@ class Watch extends \Symfony\Component\Console\Command\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->hasOption('debug') && $input->getOption('debug')) {
+            $output->writeln('<info>debug mode: enabled</info>');
             $this->watchLog->setIsDebugMode(true);
         }
 
