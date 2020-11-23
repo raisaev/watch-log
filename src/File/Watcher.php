@@ -12,11 +12,11 @@ class Watcher
     /** @var \SplFileInfo|null  */
     private $fileInfo;
 
-    /** @var \SplFileObject|null */
-    private $resource;
-
     /** @var int|null */
     private $lastModified;
+
+    /** @var int|null */
+    private $lastPosition;
 
     // ########################################
 
@@ -29,10 +29,11 @@ class Watcher
         }
 
         $this->fileInfo = new \SplFileInfo($this->filePath);
-        $this->resource = $this->fileInfo->openFile('r');
-        $this->resource->fseek(0, SEEK_END);
+        $resource = $this->fileInfo->openFile('r');
+        $resource->fseek(0, SEEK_END);
 
         $this->lastModified = $this->fileInfo->getMTime();
+        $this->lastPosition = $resource->ftell();
     }
 
     // ########################################
@@ -41,11 +42,9 @@ class Watcher
     {
         clearstatcache(true, $this->filePath);
 
-        if ($this->getFileInfo() === null) {
+        if ($this->fileInfo === null) {
             if (is_file($this->filePath)) {
                 $this->fileInfo = new \SplFileInfo($this->filePath);
-                $this->resource = $this->fileInfo->openFile('r');
-
                 $this->lastModified = $this->fileInfo->getMTime();
                 return true;
             }
@@ -62,6 +61,18 @@ class Watcher
         return true;
     }
 
+    public function getChange(): \Generator
+    {
+        $handler = $this->fileInfo->openFile('r');
+        $this->lastPosition && $handler->fseek($this->lastPosition);
+
+        while (!$handler->eof()) {
+            $line = $handler->fgets();
+            $this->lastPosition = $handler->ftell();
+            yield $line;
+        }
+    }
+
     // ########################################
 
     public function getFilePath(): string
@@ -76,14 +87,14 @@ class Watcher
         return $this->fileInfo;
     }
 
-    public function getResource(): ?\SplFileObject
-    {
-        return $this->resource;
-    }
-
     public function getLastModified(): ?int
     {
         return $this->lastModified;
+    }
+
+    public function getLastPosition(): ?int
+    {
+        return $this->lastPosition;
     }
 
     // ########################################

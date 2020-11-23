@@ -60,7 +60,7 @@ class WatchLog
             throw new Exception('No handlers registered.');
         }
 
-        $this->output->printLn('watching...');
+        $this->output->printLn(sprintf('watching... %d files', count($this->watchers)));
         $this->watch = true;
 
         do {
@@ -88,8 +88,7 @@ class WatchLog
             }
 
             try {
-                while (!$watcher->getResource()->eof()) {
-                    $line = $watcher->getResource()->fgets();
+                foreach ($watcher->getChange() as $line) {
                     if ($this->isDebugMode) {
                         $this->output->printLn($line);
                     }
