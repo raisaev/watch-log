@@ -13,6 +13,12 @@ $containerBuilder = new ContainerBuilder();
 $loader = new YamlFileLoader($containerBuilder, new FileLocator(dirname(__DIR__) . '/config'));
 $loader->load('services.yaml');
 
+try {
+    $loader->load('services.local.yaml');
+} catch (\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException $exception) {
+    //ignored
+}
+
 $dotEnv = new \Symfony\Component\Dotenv\Dotenv();
 $dotEnv->loadEnv(__DIR__ . '/../.env');
 

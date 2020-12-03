@@ -22,10 +22,12 @@ class WatchLog
     private $checkInterval;
 
     /** @var bool */
-    private $watch = false;
+    private $isDebugMode;
+
+    // ----------------------------------------
 
     /** @var bool */
-    private $isDebugMode;
+    private $watch = false;
 
     // ########################################
 

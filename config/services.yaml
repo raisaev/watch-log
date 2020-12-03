@@ -29,8 +29,3 @@ services:
       $handlers:
         - '@Isaev\WatchLog\Log\Handler\Console'
         - '@Isaev\WatchLog\Log\Handler\Telegram'
-
-  Isaev\WatchLog\File\Watcher\Loader:
-    arguments:
-      $files:
-        - 'C:\wamp64\www\amazon_services\watch-log\logging.json'
