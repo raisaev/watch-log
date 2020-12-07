@@ -18,6 +18,7 @@ services:
       $commands:
         - '@Isaev\WatchLog\Console\Command\Clear'
         - '@Isaev\WatchLog\Console\Command\Watch'
+        - '@Isaev\WatchLog\Console\Command\Size'
 
   Isaev\WatchLog\Log\Handler\Telegram:
     arguments:
